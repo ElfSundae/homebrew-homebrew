@@ -7,6 +7,8 @@ cask "quicklookapk2" do
   desc "A Quick Look plugin for Android packages"
   homepage "https://github.com/ElfSundae/QuickLookAPK"
 
+  deprecate! date: "2025-09-22", because: :no_longer_meets_criteria
+
   conflicts_with cask: "quicklookapk"
 
   qlplugin "QuickLookAPK.qlgenerator"

@@ -7,6 +7,8 @@ cask "qlcolorcode-m1" do
   desc "QuickLook plug-in that renders source code with syntax highlighting"
   homepage "https://github.com/anthonygelibert/QLColorCode"
 
+  deprecate! date: "2025-09-22", because: :no_longer_meets_criteria
+
   depends_on macos: ">= :mojave"
 
   conflicts_with cask: "qlcolorcode"
