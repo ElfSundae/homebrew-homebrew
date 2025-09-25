@@ -4,7 +4,7 @@ cask "quicklookapk2" do
 
   url "https://github.com/ElfSundae/QuickLookAPK/releases/download/#{version}/QuickLookAPK.qlgenerator-v#{version}.zip"
   name "QuickLookAPK"
-  desc "A Quick Look plugin for Android packages"
+  desc "Quick Look plugin for Android packages"
   homepage "https://github.com/ElfSundae/QuickLookAPK"
 
   deprecate! date: "2025-09-22", because: :no_longer_meets_criteria
