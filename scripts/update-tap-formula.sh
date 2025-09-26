@@ -10,7 +10,7 @@ fi
 
 FORMULA_NAME="$1"
 NEW_TAG="$2"
-TAP_DIR="$(brew --prefix)/Library/Taps/elfsundae/homebrew-homebrew/Formula"  # adjust if your tap is elsewhere
+TAP_DIR="$(brew --prefix)/Library/Taps/elfsundae/homebrew-homebrew/Formula"
 FORMULA_FILE="$TAP_DIR/$FORMULA_NAME.rb"
 
 # Ensure formula file exists
