@@ -1,15 +1,59 @@
 #!/usr/bin/env bash
-# Usage: ./update-tap-formula.sh <formula_name> <new_tag>
+# Usage: ./update-tap-formula.sh <formula_name> <new_tag> [--repo=USER/REPO] [--url=URL]
 
 set -euo pipefail
 
-if [[ $# -lt 2 ]]; then
-    echo "Usage: $0 <formula_name> <new_tag>"
+# Parse arguments: positional args are <formula_name> <new_tag>; optional flags:
+#   --repo=USER/REPO   (e.g. --repo=ElfSundae/reponame)
+#   --url=URL          (full tarball URL)
+FORMULA_NAME=""
+NEW_TAG=""
+REPO_SPEC=""
+URL=""
+GITHUB_USER="ElfSundae"
+REPO_NAME=""
+
+for arg in "$@"; do
+    case "$arg" in
+        --repo=*) REPO_SPEC="${arg#--repo=}";;
+        --url=*) URL="${arg#--url=}";;
+        --help|-h)
+            echo "Usage: $0 <formula_name> <new_tag> [--repo=USER/REPO] [--url=URL]"
+            exit 0
+            ;;
+        *)
+            if [[ -z "$FORMULA_NAME" ]]; then
+                FORMULA_NAME="$arg"
+            elif [[ -z "$NEW_TAG" ]]; then
+                NEW_TAG="$arg"
+            else
+                echo "Unknown argument: $arg" >&2
+                exit 1
+            fi
+            ;;
+    esac
+done
+
+if [[ -z "$FORMULA_NAME" || -z "$NEW_TAG" ]]; then
+    echo "Usage: $0 <formula_name> <new_tag> [--repo=USER/REPO] [--url=URL]" >&2
     exit 1
 fi
 
-FORMULA_NAME="$1"
-NEW_TAG="$2"
+# default repo/user
+REPO_NAME="${FORMULA_NAME}"
+if [[ -n "$REPO_SPEC" ]]; then
+    if [[ "$REPO_SPEC" == */* ]]; then
+        GITHUB_USER="${REPO_SPEC%%/*}"
+        REPO_NAME="${REPO_SPEC#*/}"
+    else
+        REPO_NAME="$REPO_SPEC"
+    fi
+fi
+
+if [[ -z "$URL" ]]; then
+    URL="https://github.com/$GITHUB_USER/$REPO_NAME/archive/refs/tags/$NEW_TAG.tar.gz"
+fi
+
 TAP_DIR="$(brew --prefix)/Library/Taps/elfsundae/homebrew-homebrew/Formula"
 FORMULA_FILE="$TAP_DIR/$FORMULA_NAME.rb"
 
@@ -18,11 +62,6 @@ if [[ ! -f "$FORMULA_FILE" ]]; then
     echo "Error: Formula file $FORMULA_FILE does not exist." >&2
     exit 1
 fi
-
-# Compute GitHub tarball URL
-REPO_NAME="$FORMULA_NAME"  # assumes repo name = formula name, adjust if different
-GITHUB_USER="ElfSundae"
-URL="https://github.com/$GITHUB_USER/$REPO_NAME/archive/refs/tags/$NEW_TAG.tar.gz"
 
 # Download tarball temporarily to compute sha256
 TMP_TARBALL=$(mktemp)
